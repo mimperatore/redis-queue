@@ -28,12 +28,28 @@ describe Redis::Queue do
     @queue.size.should be == 1
   end
 
+  it 'should add another element to the queue' do
+    @queue << 'a'
+    @queue.size.should be == 2
+  end
+
   it 'should return an element from the queue' do
     message = @queue.pop(true)
     message.should be == 'a'
   end
 
-  it 'should remove the element from bp_queue if commit is called' do
+  it 'should return another element from the queue' do
+    message = @queue.pop(true)
+    message.should be == 'a'
+  end
+
+  it 'should remove a single element from bp_queue if commit is called' do
+    @redis.llen('bp__test').should be == 2
+    @queue.commit
+    @redis.llen('bp__test').should be == 1
+  end
+
+  it 'should remove another single element from bp_queue if commit is called' do
     @redis.llen('bp__test').should be == 1
     @queue.commit
     @redis.llen('bp__test').should be == 0

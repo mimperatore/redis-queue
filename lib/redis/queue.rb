@@ -47,7 +47,7 @@ class Redis
     end
 
     def commit
-      @redis.lrem(@process_queue_name, 0, @last_message)
+      @redis.lrem(@process_queue_name, -1, @last_message)
     end
 
     def process(non_block = false, timeout = nil)
