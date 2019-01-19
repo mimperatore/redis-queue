@@ -63,16 +63,22 @@ describe Redis::Queue do
     @redis.llen('bp__test').should be == 0
   end
 
-  it 'should prcess a message' do
-    @queue << 'a'
-    @queue.process(true) { |m| m.should be == 'a'; true }
-  end
+  context '#process' do
+    it 'should do nothing if the queue is empty' do
+      expect { |b| @queue.process(true, &b) }.not_to yield_control
+    end
 
-  it 'should prcess a message leaving it into the bp_queue' do
-    @queue << 'a'
-    @queue << 'a'
-    @queue.process(true) { |m| m.should be == 'a'; false }
-    @redis.lrange('bp__test', 0, -1).should be == %w[a a]
+    it 'should process a message' do
+      @queue << 'a'
+      @queue.process(true) { |m| m.should be == 'a'; true }
+    end
+
+    it 'should process a message leaving it into the bp_queue' do
+      @queue << 'a'
+      @queue << 'a'
+      @queue.process(true) { |m| m.should be == 'a'; false }
+      @redis.lrange('bp__test', 0, -1).should be == %w[a a]
+    end
   end
 
   it 'should refill a main queue' do

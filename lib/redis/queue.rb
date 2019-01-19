@@ -51,6 +51,7 @@ class Redis
     end
 
     def process(non_block = false, timeout = nil)
+      return if non_block && empty?
       @timeout = timeout unless timeout.nil?
       loop do
         message = pop(non_block)
